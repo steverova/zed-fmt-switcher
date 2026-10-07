@@ -156,6 +156,47 @@ zed-fmt --help
 | `r` | recargar desde disco |
 | `q` / `esc` | salir |
 
+## Releases (CI/CD)
+
+El workflow `.github/workflows/release.yml` publica binarios al empujar un tag `v*`:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+1. **test** → `typecheck` + `bun test` (Ubuntu). El release no sale si algo falla.
+2. **build** (matrix con runner nativo por plataforma) → genera y sube:
+   - `zed-fmt-linux-x64`
+   - `zed-fmt-windows-x64.exe`
+   - `zed-fmt-darwin-arm64`
+3. **release** → crea el GitHub Release con esos assets y notas autogeneradas.
+
+Cada binario se compila en su SO nativo para que la librería nativa de OpenTUI de esa plataforma se
+instale y quede embebida (el binario es **standalone**: no necesita Bun ni Node). Para **arm64 /
+Intel macOS**, descomenta las entradas de la matriz en el workflow (usan `ubuntu-24.04-arm` y
+`macos-13`).
+
+También puedes lanzarlo a mano desde la pestaña **Actions** (`workflow_dispatch`).
+
+### Instalar un binario del release
+
+Windows:
+
+```powershell
+# descarga zed-fmt-windows-x64.exe y ponlo en una carpeta del PATH
+Move-Item .\zed-fmt-windows-x64.exe "$env:USERPROFILE\.bun\bin\zed-fmt.exe" -Force
+zed-fmt --help
+```
+
+Linux/macOS:
+
+```bash
+chmod +x zed-fmt-linux-x64
+install -m 755 zed-fmt-linux-x64 ~/.local/bin/zed-fmt   # o /usr/local/bin con sudo
+zed-fmt --help
+```
+
 ## Rutas que detecta
 
 | Sistema | settings.json | extensiones instaladas |
