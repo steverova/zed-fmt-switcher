@@ -1,0 +1,32 @@
+{
+	"name": "zed-formatter-tui",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"description": "TUI to switch the Zed editor formatter between Biome and Oxc (oxfmt).",
+	"bin": {
+		"zed-fmt": "./src/index.tsx"
+	},
+	"scripts": {
+		"start": "bun run src/index.tsx",
+		"dev": "bun run --watch src/index.tsx",
+		"compile": "bun build --compile --outfile dist/zed-fmt ./src/index.tsx",
+		"test": "bun test",
+		"typecheck": "tsc --noEmit",
+		"lint": "biome check ."
+	},
+	"dependencies": {
+		"@opentui/core": "^0.5.14",
+		"@opentui/react": "^0.5.14",
+		"jsonc-parser": "^3.3.1",
+		"react": "^19.2.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.15",
+		"@types/bun": "latest",
+		"@types/react": "^19.2.0",
+		"oxfmt": "0.72.0",
+		"oxlint": "1.87.0",
+		"typescript": "^5.9.3"
+	}
+}
