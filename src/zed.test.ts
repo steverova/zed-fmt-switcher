@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import {
 	existsSync,
 	mkdtempSync,
+	readdirSync,
 	readFileSync,
 	rmSync,
 	writeFileSync,
@@ -217,6 +218,20 @@ describe("backups", () => {
 		const restored = restoreLatestBackup(settingsPath);
 		expect(restored).toBeDefined();
 		expect(readFileSync(settingsPath, "utf8")).toContain('"a": 1');
+	});
+
+	test("backups do not collide within the same millisecond", () => {
+		const settingsPath = join(dir, "settings.json");
+		writeFileSync(settingsPath, '{\n  "n": 1\n}\n', "utf8");
+
+		writeSettings({ settingsPath, scope: "custom" }, '{\n  "n": 2\n}\n');
+		writeSettings({ settingsPath, scope: "custom" }, '{\n  "n": 3\n}\n');
+
+		const backups = readdirSync(dir).filter((name) => name.endsWith(".bak"));
+		expect(backups.length).toBe(2);
+
+		restoreLatestBackup(settingsPath);
+		expect(readFileSync(settingsPath, "utf8")).toContain('"n": 2');
 	});
 });
 

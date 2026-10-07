@@ -832,7 +832,14 @@ export function writeSettings(target: Target, content: string): WriteResult {
 
 function createBackup(path: string): string | undefined {
 	const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-	const backup = `${path}.${stamp}.bak`;
+	// A counter keeps backups unique (and sortable) even when several are
+	// created within the same millisecond, e.g. write + restore.
+	let counter = 1;
+	let backup = `${path}.${stamp}-${String(counter).padStart(4, "0")}.bak`;
+	while (existsSync(backup)) {
+		counter++;
+		backup = `${path}.${stamp}-${String(counter).padStart(4, "0")}.bak`;
+	}
 	try {
 		copyFileSync(path, backup);
 		return backup;
